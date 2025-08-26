@@ -23,6 +23,8 @@ def notice( webhook_url, title, text,notice_type: str=None):
     # 兼容企业本地化部署的飞书，如open.feishu.xxxx.com
     elif 'open.feishu.' in webhook_url:  
         notice_type = 'feishu'
+    elif 'webapi.synology' in webhook_url or '/webapi/entry.cgi' in webhook_url:
+        notice_type = 'synology'
     else:
         notice_type = 'custom'
     
@@ -32,6 +34,8 @@ def notice( webhook_url, title, text,notice_type: str=None):
         send_dingtalk_message(webhook_url, title, text)
     elif notice_type == 'feishu':
         send_feishu_message(webhook_url, title, text)
+    elif notice_type == 'synology':
+        send_custom_message(webhook_url, title, text)
     elif notice_type == 'custom':
         send_custom_message(webhook_url, title, text)
     else:
