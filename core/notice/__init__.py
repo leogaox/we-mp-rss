@@ -2,6 +2,7 @@ from .wechat import send_wechat_message
 from .dingtalk import send_dingtalk_message
 from .feishu import send_feishu_message
 from .custom import send_custom_message
+from .synology import send_synology_message
 
 def notice( webhook_url, title, text,notice_type: str=None):
     """
@@ -35,7 +36,7 @@ def notice( webhook_url, title, text,notice_type: str=None):
     elif notice_type == 'feishu':
         send_feishu_message(webhook_url, title, text)
     elif notice_type == 'synology':
-        send_custom_message(webhook_url, title, text)
+        send_synology_message(webhook_url, title, text)
     elif notice_type == 'custom':
         send_custom_message(webhook_url, title, text)
     else:
