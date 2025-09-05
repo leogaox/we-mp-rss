@@ -1,0 +1,224 @@
+# We-MP-RSS with Synology Chat Notification - Portainer Stack Example
+# 群晖Chat通知功能的Docker Stack配置示例
+
+version: '3.8'
+
+services:
+  we-mp-rss:
+    image: rachelos/we-mp-rss:latest
+    container_name: we-mp-rss
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      # 基本配置
+      - APP_NAME=we-mp-rss
+      - SERVER_NAME=we-mp-rss
+      - WEB_NAME=WeRSS微信公众号订阅助手
+      - PORT=8001
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      
+      # 数据库配置
+      - DB=sqlite:///data/db.db
+      
+      # 定时任务配置
+      - ENABLE_JOB=true
+      - SPAN_INTERVAL=10
+      
+      # 群晖Chat通知配置（可选）
+      - SYNOLOGY_CHAT_WEBHOOK=https://your-nas.example.com:5001/webapi/entry.cgi?api=SYNO.Chat.External&method=incoming&version=2&token=your_actual_token_here
+      - SYNOLOGY_CHAT_VERIFY_SSL=true
+      
+      # 其他通知渠道（可选）
+      - DINGDING_WEBHOOK=
+      - WECHAT_WEBHOOK=
+      - FEISHU_WEBHOOK=
+      - CUSTOM_WEBHOOK=
+      
+      # RSS配置
+      - RSS_BASE_URL=
+      - RSS_LOCAL=false
+      - RSS_TITLE=
+      - RSS_DESCRIPTION=
+      - RSS_FULL_CONTEXT=true
+      - RSS_ADD_COVER=true
+      
+      # 高级配置
+      - MAX_PAGE=5
+      - THREADS=2
+      - TOKEN_EXPIRE_MINUTES=4320
+      - SAFE_HIDE_CONFIG=db,secret,token,notice.wechat,notice.feishu,notice.dingding,notice.synology_chat
+    
+    # 资源限制（可选）
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'
+        reservations:
+          memory: 256M
+          cpus: '0.5'
+    
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# 数据卷配置
+volumes:
+  data:
+    driver: local
+  logs:
+    driver: local
+
+# 网络配置（可选）
+networks:
+  default:
+    driver: bridge
+
+---
+# 配置说明
+
+## 必需配置
+1. **端口映射**: `8001:8001` - 将容器端口映射到主机
+2. **数据卷**: 
+   - `./data:/app/data` - 数据库和缓存数据
+   - `./logs:/app/logs` - 日志文件
+
+## 群晖Chat配置说明
+
+### 环境变量
+- `SYNOLOGY_CHAT_WEBHOOK`: 群晖Chat的webhook URL
+- `SYNOLOGY_CHAT_VERIFY_SSL`: SSL证书验证（true/false）
+
+### 获取webhook URL
+1. 登录群晖DSM管理界面
+2. 打开Synology Chat应用
+3. 创建或选择频道
+4. 频道设置 → 集成 → 创建incoming webhook
+5. 复制生成的URL
+
+### SSL证书设置
+- `SYNOLOGY_CHAT_VERIFY_SSL=true`: 使用有效SSL证书（生产环境）
+- `SYNOLOGY_CHAT_VERIFY_SSL=false`: 使用自签名证书（测试环境）
+
+## 部署步骤
+
+### 1. 创建配置目录
+```bash
+mkdir -p ./data ./logs
+chmod 755 ./data ./logs
+```
+
+### 2. 修改配置
+编辑本文件，更新以下配置：
+- `SYNOLOGY_CHAT_WEBHOOK`: 您的实际webhook URL
+- 其他可选配置
+
+### 3. 部署到Portainer
+1. 登录Portainer
+2. 进入Stacks页面
+3. 点击"Add stack"
+4. 命名stack（如：we-mp-rss）
+5. 粘贴本文件内容
+6. 点击"Deploy the stack"
+
+### 4. 验证部署
+```bash
+# 检查容器状态
+docker ps
+
+# 查看日志
+docker logs we-mp-rss
+
+# 测试服务
+curl http://localhost:8001/api/health
+```
+
+## 更新配置
+
+### 通过Portainer更新
+1. 编辑Stack配置
+2. 更新环境变量
+3. 重新部署Stack
+
+### 通过WebUI更新（推荐）
+1. 访问 http://your-host:8001
+2. 进入系统设置 → 通知设置
+3. 配置群晖Chat设置
+4. 测试并保存
+
+## 故障排除
+
+### 常见问题
+
+1. **容器启动失败**
+   - 检查端口8001是否被占用
+   - 检查数据目录权限
+
+2. **群晖Chat连接失败**
+   - 检查webhook URL格式
+   - 检查网络连通性
+   - 对于自签名证书，设置 `SYNOLOGY_CHAT_VERIFY_SSL=false`
+
+3. **权限问题**
+   - 确保数据目录可写：`chmod 755 ./data`
+
+### 查看日志
+```bash
+# 查看容器日志
+docker logs we-mp-rss
+
+# 实时查看日志
+docker logs -f we-mp-rss
+
+# 查看特定日志
+docker logs we-mp-rss 2>&1 | grep -i synology
+```
+
+## 备份与恢复
+
+### 备份数据
+```bash
+# 备份数据库和配置
+tar -czf we-mp-rss-backup-$(date +%Y%m%d).tar.gz ./data/
+```
+
+### 恢复数据
+```bash
+# 停止服务
+docker stop we-mp-rss
+
+# 恢复备份
+tar -xzf we-mp-rss-backup-20240115.tar.gz
+
+# 启动服务
+docker start we-mp-rss
+```
+
+## 监控与维护
+
+### 资源监控
+```bash
+# 查看容器资源使用
+docker stats we-mp-rss
+
+# 查看容器详情
+docker inspect we-mp-rss
+```
+
+### 定期维护
+- 定期检查日志文件
+- 定期备份数据
+- 更新到最新版本
+
+---
+
+**注意**: 将 `your_actual_token_here` 替换为您的实际webhook token，不要将包含真实token的配置文件提交到版本控制系统。

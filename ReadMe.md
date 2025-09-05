@@ -57,6 +57,7 @@ docker run -d  --name we-mp-rss  -p 8001:8001 -v ./data:/app/data  docker.1ms.ru
 - 支持多种抓取方式
 - 支持多种RSS客户端
 - 支持授权过期提醒
+- 支持多种通知渠道：钉钉、飞书、微信企业号、群晖Chat(Synology Chat)
 
 
 # ❤️ 赞助
@@ -150,6 +151,8 @@ http://localhost:3000
 | `DINGDING_WEBHOOK` | 空 | 钉钉通知Webhook地址 |
 | `WECHAT_WEBHOOK` | 空 | 微信通知Webhook地址 |
 | `FEISHU_WEBHOOK` | 空 | 飞书通知Webhook地址 |
+| `SYNOLOGY_CHAT_WEBHOOK` | 空 | 群晖Chat通知Webhook地址 |
+| `SYNOLOGY_CHAT_VERIFY_SSL` | `true` | 群晖Chat SSL证书验证 |
 | `CUSTOM_WEBHOOK` | 空 | 自定义通知Webhook地址 |
 | `SECRET_KEY` | `we-mp-rss` | 密钥 |
 | `USER_AGENT` | `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36/WeRss` | 用户代理 |
@@ -175,7 +178,7 @@ http://localhost:3000
 | `GATHER.CONTENT_AUTO_CHECK` | `False` | 是否自动检查未采集文章内容 |
 | `GATHER.CONTENT_AUTO_INTERVAL` | `59` | 自动检查未采集文章内容的时间间隔（分钟） |
 | `GATHER.CONTENT_MODE` | `web` | 内容修正模式 |
-| `SAFE_HIDE_CONFIG` | `db,secret,token,notice.wechat,notice.feishu,notice.dingding` | 需要隐藏的配置信息 |
+| `SAFE_HIDE_CONFIG` | `db,secret,token,notice.wechat,notice.feishu,notice.dingding,notice.synology_chat` | 需要隐藏的配置信息 |
 | `SAFE_LIC_KEY` | `RACHELOS` | 授权加密KEY |
 | `LOG_FILE` | 空 | 日志文件路径 |
 | `LOG_LEVEL` | `INFO` | 日志级别 |
@@ -197,6 +200,9 @@ http://localhost:3000
 
 - **如何启用钉钉通知？**
   在 `config.yaml` 中填写 `notice.dingding` 或通过环境变量 `DINGDING_WEBHOOK` 设置。
+
+- **如何启用群晖Chat通知？**
+  在 `config.yaml` 中填写 `notice.synology_chat.webhook` 或通过环境变量 `SYNOLOGY_CHAT_WEBHOOK` 设置。对于自签名证书，设置 `SYNOLOGY_CHAT_VERIFY_SSL=false`。
 
 - **如何调整定时任务间隔？**
   修改 `config.yaml` 中的 `interval` 或通过环境变量 `SPAN_INTERVAL` 设置。
