@@ -2,7 +2,7 @@ name: Docker Base Image
 on:
   push:
     branches:
-      - main
+      - feat/synology-chat
     paths:  # 仅在指定文件变化时触发（可选）
       - 'Dockerfiles/py38/Dockerfile'
 jobs:

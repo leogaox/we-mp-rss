@@ -2,7 +2,7 @@ name: Docker Image Publish
 on:
   push:
     branches:
-      - main
+      - feat/synology-chat
     # paths:  # 仅在指定文件变化时触发（可选）
     #   # - 'ReadMe.md'
     #   - 'core/ver.py'

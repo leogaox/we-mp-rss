@@ -1,28 +1,46 @@
 name: Build and Deploy Vite Project
+
 on:
   workflow_call:
     inputs:
       target:
-        required: true
+        required: false
         type: string
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write     # 允许推送到 gh-pages
+    concurrency:
+      group: vite-pages-${{ github.ref }}
+      cancel-in-progress: true
+
     steps:
-      - name: Checkout code 
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: '20.18.3' # 替换为你的项目所需的 Node.js 版本
+          node-version: '20'     # 或 '20.x' / 从 .nvmrc 读取
+          cache: 'yarn'
+          cache-dependency-path: web_ui/yarn.lock
+
       - name: Install dependencies
-        run: yarn install
-      - name: Build project
+        working-directory: web_ui
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        working-directory: web_ui
         run: yarn build
+
       - name: Deploy to GitHub Pages
-        uses: crazy-max/ghaction-github-pages@v2
+        uses: crazy-max/ghaction-github-pages@v3
         with:
-          target_branch: gh-pages # 替换为你的部署分支名称
-          build_dir: dist # 构建输出目录
+          target_branch: gh-pages
+          build_dir: web_ui/dist        # Vite 输出目录（若在 web_ui）
+          # 如果你的站点需要自定义域名，可加：
+          # fqdn: your.domain.com
         env:
-          GITHUB_TOKEN:  ${{secrets.TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
