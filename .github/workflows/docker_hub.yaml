@@ -1,9 +1,7 @@
 name: Publish Docker image to Docker Hub
 
 on:
-  push:
-    branches: [ "feat/synology-chat" ]
-    # tags: [ "v*" ]
+  workflow_dispatch   # 仅手动触发
 
 env:
   REGISTRY: docker.io
