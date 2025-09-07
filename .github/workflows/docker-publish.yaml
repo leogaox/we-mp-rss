@@ -3,30 +3,45 @@ name: Publish Docker image to GHCR
 on:
   push:
     branches:
-      - feat/synology-chat          # 只在该分支触发
-  workflow_dispatch:                # 允许手动触发
+      - main
+      - feat/synology-chat       # 加上需要触发构建的分支
+  workflow_dispatch:
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write               # 推送 GHCR 必须
+      packages: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # ===== 前端构建 =====
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: yarn
+          cache-dependency-path: web_ui/yarn.lock
+
+      - name: Install & Build UI
+        working-directory: ./web_ui
+        run: |
+          yarn install --frozen-lockfile
+          yarn build
+          # 拷贝构建产物到后端 static 目录（与 Dockerfile COPY 保持一致）
+          mkdir -p ../static
+          cp -r dist/* ../static/
+
+      # ===== Docker 构建 =====
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 生成镜像标签与标签元数据：
-      # - images 指定 ghcr 镜像名
-      # - type=ref,event=branch: 用“分支名”生成 tag（自动把 / 转成 -）
-      # - type=raw,value=latest: 额外生成 :latest
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -43,12 +58,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & Push (amd64+arm64)
+      - name: Build & Push (amd64 only for Synology)
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
