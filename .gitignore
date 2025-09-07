@@ -13,3 +13,7 @@ data
 build
 dist
 data1
+node_modules/
+static/assets/
+driver/
+.yarn/
