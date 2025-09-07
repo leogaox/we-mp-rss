@@ -42,7 +42,7 @@ port: ${PORT:-8001}
 #调试模式
 debug: ${DEBUG:-False}
 #调试时强制推送无更新通知（仅Synology Chat）
-debug_force_notify_on_empty: ${DEBUG_FORCE_NOTIFY_ON_EMPTY:-False}
+debug_force_notify_on_empty: false
 
 
 #最大页数 第一次添加 采集的页数默认5页
