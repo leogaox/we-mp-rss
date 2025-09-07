@@ -17,3 +17,45 @@ node_modules/
 static/assets/
 driver/
 .yarn/
+
+# --- Local dev / env files ---
+.python-version
+.yarnrc.yml
+login.json
+
+# --- Yarn / Node stuff ---
+node_modules/
+web_ui/.yarn/
+web_ui/.yarn/*
+web_ui/.yarn/install-state.gz
+web_ui/package-lock.json
+
+# --- Local scripts / temp ---
+._git-sync-wip.sh
+FORCE_PUSH_IMPLEMENTATION_SUMMARY.md
+check_force_flag.py
+
+# --- Tests (local only) ---
+tests/
+web_ui/src/__tests__/
+
+# --- Local dev / env files ---
+.python-version
+.yarnrc.yml
+login.json
+
+# --- Yarn / Node stuff ---
+node_modules/
+web_ui/.yarn/
+web_ui/.yarn/*
+web_ui/.yarn/install-state.gz
+web_ui/package-lock.json
+
+# --- Local scripts / temp ---
+._git-sync-wip.sh
+FORCE_PUSH_IMPLEMENTATION_SUMMARY.md
+check_force_flag.py
+
+# --- Tests (local only) ---
+tests/
+web_ui/src/__tests__/
