@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import { Message, Modal } from '@arco-design/web-vue'
 import ResponsiveTable from '@/components/ResponsiveTable.vue'
 import TaskList from '@/components/TaskList.vue'
+import { MESSAGE_TYPES, MESSAGE_TYPE_COLORS } from '@/constants/messageTypes'
 
 const isMobile = ref(window.innerWidth < 768)
 const handleResize = () => {
@@ -207,10 +208,10 @@ onMounted(() => {
             {{ parseCronExpression(record.cron_exp) }}
           </template>
         </a-table-column>
-        <a-table-column title="类型" :width="100">
+        <a-table-column title="类型" :width="120">
           <template #cell="{ record }">
-            <a-tag :color="record.message_type === 1 ? 'green' : 'red'">
-              {{ record.message_type === 1 ? 'WeekHook' : 'Message' }}
+            <a-tag :color="MESSAGE_TYPE_COLORS[record.message_type as keyof typeof MESSAGE_TYPE_COLORS]">
+              {{ MESSAGE_TYPES[record.message_type as keyof typeof MESSAGE_TYPES] }}
             </a-tag>
           </template>
         </a-table-column>
@@ -231,8 +232,8 @@ onMounted(() => {
           <template #description>
             <div>{{ parseCronExpression(item.cron_exp) }}</div>
             <div>
-              <a-tag :color="item.message_type === 1 ? 'green' : 'red'">
-                {{ item.message_type === 1 ? 'WeekHook' : 'Message' }}
+              <a-tag :color="MESSAGE_TYPE_COLORS[item.message_type as keyof typeof MESSAGE_TYPE_COLORS]">
+                {{ MESSAGE_TYPES[item.message_type as keyof typeof MESSAGE_TYPES] }}
               </a-tag>
               <a-tag :color="item.status === 1 ? 'green' : 'red'">
                 {{ item.status === 1 ? '启用' : '禁用' }}

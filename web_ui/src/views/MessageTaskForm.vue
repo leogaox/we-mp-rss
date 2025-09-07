@@ -28,6 +28,8 @@ const formData = ref<MessageTaskCreate>({
   cron_exp: '*/5 * * * *'
 })
 
+const SYN_CHAT_TEMPLATE = '【${mp_name}】${title}\n${summary}\n原文：${url}'
+
 const fetchTaskDetail = async (id: string) => {
   loading.value = true
   try {
@@ -129,6 +131,7 @@ onMounted(() => {
           <a-radio-group v-model="formData.message_type" type="button">
             <a-radio :value="0">Message</a-radio>
             <a-radio :value="1">WebHook</a-radio>
+            <a-radio :value="2">Synochat</a-radio>
           </a-radio-group>
         </a-form-item>
         
@@ -145,22 +148,44 @@ onMounted(() => {
             @click="formData.message_template = '### {{feed.mp_name}} 订阅消息：\n{% if articles %}\n{% for article in articles %}\n- [**{{ article.title }}**]({{article.url}}) ({{ article.publish_time }})\n\n{% endfor %}\n{% else %}\n- 暂无文章\n\n{% endif %}'">
             使用示例消息模板
           </a-button>
-          <a-button v-else
+          <a-button v-else-if="formData.message_type === 1"
             type="outline" 
             style="margin-top: 8px"
             @click="formData.message_template = '{\'articles\': [{% for article in articles %}{{article}}{% if not loop.last %},{% endif %}{% endfor %}]{% endfor %}]}'">
             
             使用示例WebHook模板
           </a-button>
+          <a-button v-else-if="formData.message_type === 2"
+            type="outline" 
+            style="margin-top: 8px"
+            @click="formData.message_template = SYN_CHAT_TEMPLATE">
+            使用示例Synochat模板
+          </a-button>
         </a-form-item>
 
-        <a-form-item label="WebHook地址" field="web_hook_url">
+        <a-form-item 
+          v-if="formData.message_type !== 2" 
+          label="WebHook地址" 
+          field="web_hook_url">
           <a-input
             v-model="formData.web_hook_url"
             placeholder="请输入WebHook地址"
           />
           <a-link href="https://open.dingtalk.com/document/orgapp/obtain-the-webhook-address-of-a-custom-robot" target="_blank">如何获取WebHook</a-link>
         </a-form-item>
+
+        <a-form-item 
+          v-if="formData.message_type === 2" 
+          label="Synology Chat Webhook" 
+          field="web_hook_url"
+          :rules="[{ required: true, message: 'Webhook 不能为空' }]">
+          <a-input
+            v-model="formData.web_hook_url"
+            placeholder="请输入Synology Chat Webhook地址"
+          />
+          <a-link href="https://kb.synology.com/zh-cn/DSM/help/Chat/chat_integration?version=7" target="_blank">如何获取Synology Chat Webhook</a-link>
+        </a-form-item>
+
 
         <a-form-item label="cron表达式" field="cron_exp" required>
           <a-space>
@@ -248,5 +273,19 @@ onMounted(() => {
 h2 {
   margin-bottom: 20px;
   color: var(--color-text-1);
+}
+
+.synochat-placeholder {
+  padding: 16px;
+  background-color: var(--color-fill-2);
+  border-radius: 4px;
+  border: 1px dashed var(--color-border-2);
+  text-align: center;
+  color: var(--color-text-3);
+}
+
+.synochat-placeholder p {
+  margin: 0;
+  font-size: 14px;
 }
 </style>

@@ -10,6 +10,7 @@ import ConfigList from '../views/ConfigList.vue'
 import ConfigDetail from '../views/ConfigDetail.vue'
 import MessageTaskList from '../views/MessageTaskList.vue'
 import MessageTaskForm from '../views/MessageTaskForm.vue'
+import SynochatSettings from '../views/SynochatSettings.vue'
 import NovelReader from '../views/NovelReader.vue'
 
 const routes = [
@@ -96,6 +97,15 @@ const routes = [
         meta: { 
           requiresAuth: true,
           permissions: ['message_task:edit'] 
+        }
+      },
+      {
+        path: 'synochat-settings',
+        name: 'SynochatSettings',
+        component: SynochatSettings,
+        meta: { 
+          requiresAuth: true,
+          permissions: ['admin'] 
         }
       },
       {
